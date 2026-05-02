@@ -24,7 +24,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <footer className="border-t border-slate-200 bg-white py-6 text-sm text-slate-600">
             <div className="mx-auto max-w-6xl px-4">
-              CIS 550 · Data is illustrative until RDS is fully populated.
+              CIS 5500 Final Project, created by Krishav Singla, Aarav Mulinti, Anika Sundararajan, Natalie Lim.
             </div>
           </footer>
         </div>

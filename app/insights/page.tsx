@@ -7,12 +7,13 @@ export default function InsightsPage(): React.JSX.Element {
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">
           Advanced insights
         </p>
-        <h1 className="text-3xl font-semibold text-ink">Query lab</h1>
+        <h1 className="text-3xl font-semibold text-ink">Market Insights</h1>
         <p className="text-sm text-slate-600">
-          Each button calls a dedicated API route that mirrors the complex analytics described in
-          Milestone 2 (growth filters, mismatch detection, affordability index). When the database
-          is empty or unreachable, the handlers fall back to structured mock payloads so the UI
-          still tells a coherent story during early integration.
+          Insights runs complex queries across housing, Census, and school datasets to surface
+          non-obvious patterns. Discover ZIP codes with the strongest price growth in lower-income
+          areas, markets where school quality outpaces home prices (potentially undervalued), and an
+          affordability index ranking that shows where income can most comfortably support home
+          ownership — optionally filtered by state.
         </p>
       </div>
       <InsightsPanel />

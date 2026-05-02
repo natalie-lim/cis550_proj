@@ -15,9 +15,10 @@ export default function HomePage(): React.JSX.Element {
             Compare affordability, growth, and school quality across ZIP codes.
           </h1>
           <p className="text-base text-slate-600">
-            This milestone scaffold wires five distinct pages to PostgreSQL-backed API routes.
-            With <code className="rounded bg-slate-100 px-1">DATABASE_URL</code> unset, APIs
-            fall back to curated mock JSON so the UI stays demo-ready.
+            HomeZone Insights combines housing price data, U.S. Census statistics, and school
+            quality metrics to help you understand housing markets at the ZIP code level. Search
+            any ZIP to see price trends, affordability, and nearby school scores — or compare two
+            markets side by side.
           </p>
           <ZipSearchForm />
           <div className="flex flex-wrap gap-2 text-xs text-slate-500">

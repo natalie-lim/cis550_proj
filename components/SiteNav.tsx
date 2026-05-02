@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 const links: ReadonlyArray<{ href: string; label: string }> = [
-  { href: "/", label: "Home / Map" },
-  { href: "/compare", label: "Compare ZIPs" },
+  { href: "/", label: "Home" },
+  { href: "/compare", label: "Compare" },
   { href: "/insights", label: "Insights" },
   { href: "/about", label: "About" }
 ];
