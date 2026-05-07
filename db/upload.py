@@ -40,6 +40,13 @@ def to_float(v):
         return None
 
 
+def to_int(v):
+    try:
+        return int(float(v)) if v not in (None, "", "nan", "NA", "N/A") else None
+    except (ValueError, TypeError):
+        return None
+
+
 def norm_zip(z):
     return str(z).strip().zfill(5)[:5]
 
@@ -100,7 +107,7 @@ with open(f"{DATA_DIR}/acs_cleaned.csv", encoding="utf-8", errors="replace") as 
 
 execute_values(
     cur,
-    "INSERT INTO CensusData (zip_code, median_income, median_rent, education_level, commute_time) VALUES %s ON CONFLICT DO NOTHING",
+    "INSERT INTO CensusData (zip_code, median_income, median_rent, commute_time) VALUES %s ON CONFLICT DO NOTHING",
     census_rows,
 )
 conn.commit()
@@ -160,6 +167,7 @@ print("Step 4: Loading School...")
 ncessch_to_name_zip: dict[str, tuple[str, str]] = {}
 school_insert: list[tuple] = []
 seen_school_pairs: set[tuple] = set()
+school_stats_from_nces: dict[tuple[str, str], tuple[float | None, int | None]] = {}
 
 with open(f"{DATA_DIR}/nces_cleaned.csv", encoding="utf-8", errors="replace") as f:
     for row in csv.DictReader(f):
@@ -168,15 +176,32 @@ with open(f"{DATA_DIR}/nces_cleaned.csv", encoding="utf-8", errors="replace") as
         zp = norm_zip(row.get("LZIP", ""))
         if not ncessch or not name or zp not in valid_zips:
             continue
+        school_type_raw = (row.get("SCH_TYPE") or row.get("school_type") or "").strip().lower()
+        school_type = "Charter" if "charter" in school_type_raw else "Public"
+        g_lo = to_int(row.get("GSLO") or row.get("grade_low"))
+        g_hi = to_int(row.get("GSHI") or row.get("grade_high"))
+        grade_low = "K" if g_lo == 0 else str(g_lo) if g_lo is not None else None
+        grade_high = "K" if g_hi == 0 else str(g_hi) if g_hi is not None else None
+        grade_range = (
+            f"{grade_low}-{grade_high}" if grade_low is not None and grade_high is not None else None
+        )
+        student_teacher_ratio = to_float(
+            row.get("STUTERATIO") or row.get("student_teacher_ratio")
+        )
+        enrollment = to_int(row.get("MEMBER") or row.get("enrollment"))
         ncessch_to_name_zip[ncessch] = (name, zp)
         pair = (name, zp)
         if pair not in seen_school_pairs:
             seen_school_pairs.add(pair)
-            school_insert.append(pair)
+            school_insert.append((name, zp, school_type, grade_range))
+            school_stats_from_nces[pair] = (student_teacher_ratio, enrollment)
 
 execute_values(
     cur,
-    "INSERT INTO School (name, zip_code) VALUES %s ON CONFLICT DO NOTHING",
+    """INSERT INTO School (name, zip_code, school_type, grade_range) VALUES %s
+       ON CONFLICT (name, zip_code) DO UPDATE SET
+         school_type = COALESCE(EXCLUDED.school_type, School.school_type),
+         grade_range = COALESCE(EXCLUDED.grade_range, School.grade_range)""",
     school_insert,
 )
 conn.commit()
@@ -187,6 +212,29 @@ name_zip_to_id: dict[tuple, int] = {
 }
 
 print(f"  Inserted {len(school_insert)} schools")
+
+# Backfill publicly available NCES metrics for broader school coverage.
+nces_stats_rows = []
+for pair, (student_teacher_ratio, enrollment) in school_stats_from_nces.items():
+    sid = name_zip_to_id.get(pair)
+    if sid is None:
+        continue
+    if student_teacher_ratio is None and enrollment is None:
+        continue
+    nces_stats_rows.append((sid, None, student_teacher_ratio, enrollment))
+
+if nces_stats_rows:
+    execute_values(
+        cur,
+        """INSERT INTO SchoolStats (school_id, test_score, student_teacher_ratio, enrollment)
+           VALUES %s
+           ON CONFLICT (school_id) DO UPDATE SET
+             student_teacher_ratio = COALESCE(EXCLUDED.student_teacher_ratio, SchoolStats.student_teacher_ratio),
+             enrollment = COALESCE(EXCLUDED.enrollment, SchoolStats.enrollment)""",
+        nces_stats_rows,
+    )
+    conn.commit()
+print(f"  Upserted {len(nces_stats_rows)} NCES school stats rows")
 
 
 # ── Step 5: SchoolStats ───────────────────────────────────────────────────────
@@ -217,12 +265,16 @@ with open(f"{DATA_DIR}/seda_cleaned.csv", encoding="utf-8", errors="replace") as
             school_scores[sid] = score
 
 stats_rows = [(sid, score, None, None) for sid, score in school_scores.items()]
-execute_values(
-    cur,
-    "INSERT INTO SchoolStats (school_id, test_score, student_teacher_ratio, enrollment) VALUES %s ON CONFLICT DO NOTHING",
-    stats_rows,
-)
-conn.commit()
+if stats_rows:
+    execute_values(
+        cur,
+        """INSERT INTO SchoolStats (school_id, test_score, student_teacher_ratio, enrollment)
+           VALUES %s
+           ON CONFLICT (school_id) DO UPDATE SET
+             test_score = EXCLUDED.test_score""",
+        stats_rows,
+    )
+    conn.commit()
 print(f"  Inserted {len(stats_rows)} school stats")
 
 cur.close()

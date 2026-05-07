@@ -16,9 +16,9 @@ const MAX_PAGES = 5;
 const TABS: ReadonlyArray<{ id: TabKey; label: string; description: string }> = [
   {
     id: "growth",
-    label: "Rising & Affordable",
+    label: "Emerging Value Markets",
     description:
-      "Top 50 ZIP codes where home values are growing fastest among areas with below-median household income — good opportunities to buy before prices climb further."
+      "Top 50 ZIP codes where home values are growing fastest among areas with below-median household income — strong momentum in markets that are still relatively accessible."
   },
   {
     id: "undervalued",
@@ -28,7 +28,7 @@ const TABS: ReadonlyArray<{ id: TabKey; label: string; description: string }> = 
   },
   {
     id: "affordability",
-    label: "Most Affordable Areas",
+    label: "Best Price-to-Income Value",
     description:
       "Top 50 ZIP codes with the lowest price-to-income ratio — where a typical salary goes furthest toward buying a home. Filter by state to compare within your region."
   }

@@ -7,6 +7,8 @@ type Row = {
   school_type: string | null;
   grade_range: string | null;
   test_score: number | null;
+  student_teacher_ratio: number | null;
+  enrollment: number | null;
 };
 
 export async function GET(
@@ -26,7 +28,13 @@ export async function GET(
   const levelNormalized = level ? level.toUpperCase() : null;
 
   const rows = await queryRows<Row>(
-    `SELECT s.school_id, s.name, s.school_type, s.grade_range, ss.test_score
+    `SELECT s.school_id,
+            s.name,
+            s.school_type,
+            s.grade_range,
+            ss.test_score,
+            ss.student_teacher_ratio,
+            ss.enrollment
      FROM School s
      LEFT JOIN SchoolStats ss ON ss.school_id = s.school_id
      WHERE s.zip_code = $1

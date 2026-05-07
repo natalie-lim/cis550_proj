@@ -39,10 +39,20 @@ export default async function ZipDetailPage(
     maximumFractionDigits: 0
   });
 
-  function scoreOutOfTen(score: number | null): number | null {
-    if (score == null) return null;
-    // NCES/SEDA-style scores are centered around 0, so map roughly [-2.5, 2.5] to [0, 10].
-    return Math.max(0, Math.min(10, ((score + 2.5) / 5) * 10));
+  function scoreOutOfTen(
+    score: number | null,
+    studentTeacherRatio: number | null
+  ): number | null {
+    if (score != null) {
+      // NCES/SEDA-style scores are centered around 0, so map roughly [-2.5, 2.5] to [0, 10].
+      return Math.max(0, Math.min(10, ((score + 2.5) / 5) * 10));
+    }
+    if (studentTeacherRatio != null) {
+      // Public NCES proxy fallback: lower ratio is generally better.
+      const normalized = ((30 - studentTeacherRatio) / (30 - 8)) * 10;
+      return Math.max(0, Math.min(10, normalized));
+    }
+    return null;
   }
 
   function scorePillClasses(normalizedScore: number | null): string {
@@ -145,6 +155,8 @@ export default async function ZipDetailPage(
               <tr>
                 <th className="pb-2 pr-6">School</th>
                 <th className="pb-2 pr-6">Academic rating (/10)</th>
+                <th className="pb-2 pr-6">Students</th>
+                <th className="pb-2 pr-6">Student/Teacher</th>
                 <th className="pb-2 pr-6">Type</th>
                 <th className="pb-2">Grades</th>
               </tr>
@@ -153,7 +165,10 @@ export default async function ZipDetailPage(
               {data.schools.map((school) => (
                 <tr key={school.school_id}>
                   {(() => {
-                    const normalizedScore = scoreOutOfTen(school.test_score);
+                    const normalizedScore = scoreOutOfTen(
+                      school.test_score,
+                      school.student_teacher_ratio
+                    );
                     const scoreText =
                       normalizedScore == null ? "N/A" : `${normalizedScore.toFixed(1)}/10`;
                     return (
@@ -165,6 +180,14 @@ export default async function ZipDetailPage(
                     >
                       {scoreText}
                     </span>
+                  </td>
+                  <td className="py-2 pr-6">
+                    {school.enrollment != null ? school.enrollment.toLocaleString("en-US") : "—"}
+                  </td>
+                  <td className="py-2 pr-6">
+                    {school.student_teacher_ratio != null
+                      ? school.student_teacher_ratio.toFixed(1)
+                      : "—"}
                   </td>
                   <td className="py-2 pr-6">{school.school_type ?? "—"}</td>
                   <td className="py-2">{school.grade_range ?? "—"}</td>

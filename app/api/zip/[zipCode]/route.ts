@@ -23,6 +23,8 @@ type SchoolDbRow = {
   school_id: number;
   name: string;
   test_score: number | null;
+  student_teacher_ratio: number | null;
+  enrollment: number | null;
   school_type: string | null;
   grade_range: string | null;
 };
@@ -72,6 +74,8 @@ export async function GET(
     `SELECT s.school_id AS school_id,
             s.name AS name,
             ss.test_score AS test_score,
+            ss.student_teacher_ratio AS student_teacher_ratio,
+            ss.enrollment AS enrollment,
             s.school_type AS school_type,
             s.grade_range AS grade_range
      FROM School s
@@ -102,6 +106,8 @@ export async function GET(
     school_id: row.school_id,
     name: row.name,
     test_score: row.test_score,
+    student_teacher_ratio: row.student_teacher_ratio,
+    enrollment: row.enrollment,
     school_type: row.school_type,
     grade_range: row.grade_range
   }));

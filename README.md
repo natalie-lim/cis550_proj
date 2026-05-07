@@ -25,6 +25,15 @@ psql "$DATABASE_URL" -f db/schema.sql
 psql "$DATABASE_URL" -f db/seed.sql
 ```
 
+### Backfill public school stats (NCES)
+
+To reduce missing school fields, backfill enrollment and student-teacher ratio from public NCES data:
+
+```bash
+DATABASE_URL="$DATABASE_URL" NCES_CSV=~/Downloads/cleaned/nces_cleaned.csv \
+python3 db/backfill_schoolstats_nces_public.py
+```
+
 ## Run locally
 
 ```bash

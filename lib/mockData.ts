@@ -29,6 +29,8 @@ const mockZipDetail: Record<string, ZipDetailResponse> = {
         school_id: 1,
         name: "Beverly Hills High",
         test_score: 1.2,
+        student_teacher_ratio: 16.4,
+        enrollment: 1250,
         school_type: "Public",
         grade_range: "9-12"
       }
@@ -54,6 +56,8 @@ const mockZipDetail: Record<string, ZipDetailResponse> = {
         school_id: 2,
         name: "Midtown STEM Academy",
         test_score: 0.8,
+        student_teacher_ratio: 14.2,
+        enrollment: 880,
         school_type: "Charter",
         grade_range: "6-12"
       }
@@ -87,6 +91,8 @@ export function getMockZipDetail(zip: string): ZipDetailResponse {
         school_id: 99,
         name: "Neighborhood Public School",
         test_score: 0.1,
+        student_teacher_ratio: 18.9,
+        enrollment: 640,
         school_type: "Public",
         grade_range: "K-8"
       }

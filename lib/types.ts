@@ -31,6 +31,10 @@ export type SchoolRow = {
   name: string;
   /** SEDA cohort-standardized test score (z-score; 0 = national average). */
   test_score: number | null;
+  /** NCES public data field; lower is generally better. */
+  student_teacher_ratio: number | null;
+  /** NCES membership count (student enrollment). */
+  enrollment: number | null;
   /** "Public" or "Charter" from NCES. */
   school_type: string | null;
   /** Grade range string, e.g. "K-8", "9-12" (from NCES GSLO/GSHI). */
