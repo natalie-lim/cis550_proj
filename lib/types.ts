@@ -77,3 +77,17 @@ export type InsightListResponse = {
   results: ReadonlyArray<InsightRow>;
   source: "database" | "mock";
 };
+
+/** One ZIP snippet returned by /api/state/[stateCode]. */
+export type StateZipSnippet = {
+  zip_code: string;
+  city: string | null;
+  median_income: number | null;
+};
+
+/** Response shape for /api/state/[stateCode]. */
+export type StateZipListResponse = {
+  state: string;
+  zips: ReadonlyArray<StateZipSnippet>;
+  source: "database" | "mock";
+};
