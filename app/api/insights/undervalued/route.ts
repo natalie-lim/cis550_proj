@@ -10,7 +10,7 @@
 // guaranteeing the school quality advantage is real and not just a statistical artifact.
 
 import { getCached, setCached } from "@/lib/cache";
-import { queryRows } from "@/lib/db";
+import { getPool, queryRows } from "@/lib/db";
 import { getMockUndervalued } from "@/lib/mockData";
 import type { InsightListResponse, InsightRow } from "@/lib/types";
 import { NextResponse } from "next/server";
@@ -87,6 +87,9 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
   );
 
   if (rows.length === 0) {
+    if (getPool()) {
+      return NextResponse.json({ results: [], source: "database" });
+    }
     return NextResponse.json(getMockUndervalued(limit));
   }
 

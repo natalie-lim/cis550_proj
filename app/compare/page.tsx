@@ -193,7 +193,7 @@ export default async function ComparePage(
                     <dd className="font-semibold">
                       {row.avg_school_test_score != null
                         ? row.avg_school_test_score.toFixed(1)
-                        : "—"}
+                        : "Score unavailable"}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3">

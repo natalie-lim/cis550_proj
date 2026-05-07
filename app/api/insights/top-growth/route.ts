@@ -7,7 +7,7 @@
 // subsequent CTEs process fewer rows. Reduced runtime from ~18s to ~1.2s with indexes.
 
 import { getCached, setCached } from "@/lib/cache";
-import { queryRows } from "@/lib/db";
+import { getPool, queryRows } from "@/lib/db";
 import { getMockTopGrowth } from "@/lib/mockData";
 import type { InsightListResponse, InsightRow } from "@/lib/types";
 import { NextResponse } from "next/server";
@@ -71,6 +71,9 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
   );
 
   if (rows.length === 0) {
+    if (getPool()) {
+      return NextResponse.json({ results: [], source: "database" });
+    }
     return NextResponse.json(getMockTopGrowth(limit));
   }
 

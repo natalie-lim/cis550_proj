@@ -40,7 +40,7 @@ export default async function ZipDetailPage(
   });
 
   function scoreLabel(score: number | null): string {
-    if (score == null) return "—";
+    if (score == null) return "Score unavailable";
     if (score >= 1.0) return "Well above average";
     if (score >= 0.5) return "Above average";
     if (score >= -0.5) return "Average";

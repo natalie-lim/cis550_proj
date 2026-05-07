@@ -35,7 +35,8 @@ export async function GET(request: Request): Promise<NextResponse<CompareRespons
     .slice(0, 5);
 
   if (zips.length === 0) {
-    return NextResponse.json({ zips: [], source: "mock" });
+    if (!getPool()) return NextResponse.json({ zips: [], source: "mock" });
+    return NextResponse.json({ zips: [], source: "database" });
   }
 
   const zipRows: ZipRow[] = await queryRows<ZipRow>(
