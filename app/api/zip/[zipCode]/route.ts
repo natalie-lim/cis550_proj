@@ -63,6 +63,7 @@ export async function GET(
     `SELECT hd.zip_code AS zip_code, hd.date AS date, hd.home_value AS home_value
      FROM HousingData hd
      WHERE hd.zip_code = $1
+       AND hd.date = (date_trunc('month', hd.date) + INTERVAL '1 month - 1 day')::date
      ORDER BY hd.date ASC`,
     [normalized]
   );
