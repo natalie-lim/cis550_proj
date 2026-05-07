@@ -1,4 +1,4 @@
-import { queryRows } from "@/lib/db";
+import { getPool, queryRows } from "@/lib/db";
 import { getMockCompare } from "@/lib/mockData";
 import type {
   CensusRow,
@@ -40,7 +40,8 @@ export async function GET(request: Request): Promise<NextResponse<CompareRespons
   );
 
   if (zipRows.length === 0) {
-    return NextResponse.json(getMockCompare(zips));
+    if (!getPool()) return NextResponse.json(getMockCompare(zips));
+    return NextResponse.json({ zips: [], source: "database" } as CompareResponse);
   }
 
   const censusRows: CensusDbRow[] = await queryRows<CensusDbRow>(
@@ -94,8 +95,9 @@ export async function GET(request: Request): Promise<NextResponse<CompareRespons
       {
         median_income: row.median_income,
         median_rent: row.median_rent,
-        education_level: row.education_level,
-        commute_time: row.commute_time
+        commute_time: row.commute_time,
+        unemployment_rate: row.unemployment_rate ?? null,
+        poverty_rate: row.poverty_rate ?? null
       }
     ])
   );

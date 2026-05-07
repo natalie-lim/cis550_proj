@@ -7,8 +7,9 @@ export type ZipSummary = {
 export type CensusRow = {
   median_income: number | null;
   median_rent: number | null;
-  education_level: number | null;
   commute_time: number | null;
+  unemployment_rate: number | null;
+  poverty_rate: number | null;
 };
 
 export type HousingPoint = {
@@ -20,8 +21,8 @@ export type SchoolRow = {
   school_id: number;
   name: string;
   test_score: number | null;
-  student_teacher_ratio: number | null;
-  enrollment: number | null;
+  school_type: string | null;
+  grade_range: string | null;
 };
 
 export type ZipDetailResponse = {

@@ -39,6 +39,15 @@ export default async function ZipDetailPage(
     maximumFractionDigits: 0
   });
 
+  function scoreLabel(score: number | null): string {
+    if (score == null) return "—";
+    if (score >= 1.0) return "Well above average";
+    if (score >= 0.5) return "Above average";
+    if (score >= -0.5) return "Average";
+    if (score >= -1.0) return "Below average";
+    return "Well below average";
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-10">
       <div className="flex flex-col gap-2">
@@ -83,10 +92,18 @@ export default async function ZipDetailPage(
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-slate-500">Education index</dt>
+              <dt className="text-slate-500">Unemployment rate</dt>
               <dd className="font-semibold text-ink">
-                {data.census?.education_level != null
-                  ? data.census.education_level.toFixed(2)
+                {data.census?.unemployment_rate != null
+                  ? `${data.census.unemployment_rate.toFixed(1)}%`
+                  : "—"}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-slate-500">Poverty rate</dt>
+              <dd className="font-semibold text-ink">
+                {data.census?.poverty_rate != null
+                  ? `${data.census.poverty_rate.toFixed(1)}%`
                   : "—"}
               </dd>
             </div>
@@ -113,23 +130,19 @@ export default async function ZipDetailPage(
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs uppercase text-slate-500">
               <tr>
-                <th className="pb-2">School</th>
-                <th className="pb-2">Test score</th>
-                <th className="pb-2">Students / teacher</th>
-                <th className="pb-2">Enrollment</th>
+                <th className="pb-2 pr-6">School</th>
+                <th className="pb-2 pr-6">Academic rating</th>
+                <th className="pb-2 pr-6">Type</th>
+                <th className="pb-2">Grades</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {data.schools.map((school) => (
                 <tr key={school.school_id}>
-                  <td className="py-2 font-medium text-ink">{school.name}</td>
-                  <td className="py-2">{school.test_score ?? "—"}</td>
-                  <td className="py-2">
-                    {school.student_teacher_ratio != null
-                      ? school.student_teacher_ratio.toFixed(1)
-                      : "—"}
-                  </td>
-                  <td className="py-2">{school.enrollment ?? "—"}</td>
+                  <td className="py-2 pr-6 font-medium text-ink">{school.name}</td>
+                  <td className="py-2 pr-6">{scoreLabel(school.test_score)}</td>
+                  <td className="py-2 pr-6">{school.school_type ?? "—"}</td>
+                  <td className="py-2">{school.grade_range ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

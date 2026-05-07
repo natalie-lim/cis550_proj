@@ -12,7 +12,8 @@ const mockZipDetail: Record<string, ZipDetailResponse> = {
     census: {
       median_income: 125000,
       median_rent: 2800,
-      education_level: 0.62,
+      unemployment_rate: 4.2,
+      poverty_rate: 8.1,
       commute_time: 32
     },
     housingSeries: [
@@ -26,9 +27,9 @@ const mockZipDetail: Record<string, ZipDetailResponse> = {
       {
         school_id: 1,
         name: "Beverly Hills High",
-        test_score: 88,
-        student_teacher_ratio: 18,
-        enrollment: 1200
+        test_score: 1.2,
+        school_type: "Public",
+        grade_range: "9-12"
       }
     ],
     source: "mock"
@@ -38,7 +39,8 @@ const mockZipDetail: Record<string, ZipDetailResponse> = {
     census: {
       median_income: 98000,
       median_rent: 3200,
-      education_level: 0.58,
+      unemployment_rate: 5.8,
+      poverty_rate: 14.2,
       commute_time: 35
     },
     housingSeries: [
@@ -50,9 +52,9 @@ const mockZipDetail: Record<string, ZipDetailResponse> = {
       {
         school_id: 2,
         name: "Midtown STEM Academy",
-        test_score: 82,
-        student_teacher_ratio: 14,
-        enrollment: 900
+        test_score: 0.8,
+        school_type: "Charter",
+        grade_range: "6-12"
       }
     ],
     source: "mock"
@@ -70,7 +72,8 @@ export function getMockZipDetail(zip: string): ZipDetailResponse {
     census: {
       median_income: 72000,
       median_rent: 1650,
-      education_level: 0.45,
+      unemployment_rate: 6.1,
+      poverty_rate: 12.4,
       commute_time: 28
     },
     housingSeries: [
@@ -82,9 +85,9 @@ export function getMockZipDetail(zip: string): ZipDetailResponse {
       {
         school_id: 99,
         name: "Neighborhood Public School",
-        test_score: 76,
-        student_teacher_ratio: 16,
-        enrollment: 640
+        test_score: 0.1,
+        school_type: "Public",
+        grade_range: "K-8"
       }
     ],
     source: "mock"

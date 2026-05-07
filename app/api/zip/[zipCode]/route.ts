@@ -1,4 +1,4 @@
-import { queryRows } from "@/lib/db";
+import { getPool, queryRows } from "@/lib/db";
 import { getMockZipDetail } from "@/lib/mockData";
 import type {
   CensusRow,
@@ -19,8 +19,8 @@ type SchoolDbRow = {
   school_id: number;
   name: string;
   test_score: number | null;
-  student_teacher_ratio: number | null;
-  enrollment: number | null;
+  school_type: string | null;
+  grade_range: string | null;
 };
 
 export async function GET(
@@ -38,16 +38,18 @@ export async function GET(
   );
 
   if (zipRows.length === 0) {
-    const mock: ZipDetailResponse = getMockZipDetail(normalized);
-    return NextResponse.json(mock);
+    // No DB connection — fall back to mock for dev; DB connected but ZIP missing — 404
+    if (!getPool()) return NextResponse.json(getMockZipDetail(normalized));
+    return new NextResponse(null, { status: 404 }) as NextResponse<ZipDetailResponse>;
   }
 
   const censusRows: CensusDbRow[] = await queryRows<CensusDbRow>(
     `SELECT cd.zip_code AS zip_code,
             cd.median_income AS median_income,
             cd.median_rent AS median_rent,
-            cd.education_level AS education_level,
-            cd.commute_time AS commute_time
+            cd.commute_time AS commute_time,
+            cd.unemployment_rate AS unemployment_rate,
+            cd.poverty_rate AS poverty_rate
      FROM CensusData cd
      WHERE cd.zip_code = $1`,
     [normalized]
@@ -65,8 +67,8 @@ export async function GET(
     `SELECT s.school_id AS school_id,
             s.name AS name,
             ss.test_score AS test_score,
-            ss.student_teacher_ratio AS student_teacher_ratio,
-            ss.enrollment AS enrollment
+            s.school_type AS school_type,
+            s.grade_range AS grade_range
      FROM School s
      LEFT JOIN SchoolStats ss ON ss.school_id = s.school_id
      WHERE s.zip_code = $1
@@ -80,8 +82,9 @@ export async function GET(
     ? {
         median_income: censusRow.median_income,
         median_rent: censusRow.median_rent,
-        education_level: censusRow.education_level,
-        commute_time: censusRow.commute_time
+        commute_time: censusRow.commute_time,
+        unemployment_rate: censusRow.unemployment_rate,
+        poverty_rate: censusRow.poverty_rate
       }
     : null;
 
@@ -94,8 +97,8 @@ export async function GET(
     school_id: row.school_id,
     name: row.name,
     test_score: row.test_score,
-    student_teacher_ratio: row.student_teacher_ratio,
-    enrollment: row.enrollment
+    school_type: row.school_type,
+    grade_range: row.grade_range
   }));
 
   const body: ZipDetailResponse = {
