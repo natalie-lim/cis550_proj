@@ -18,10 +18,22 @@ type HousingTrendChartProps = {
 export function HousingTrendChart(
   props: HousingTrendChartProps
 ): React.JSX.Element {
-  const chartData = props.data.map((point) => ({
+  const chartData = props.data
+    .filter((point) => point.home_value != null)
+    .map((point) => ({
     month: point.date,
-    value: point.home_value ?? 0
+    value: point.home_value as number
   }));
+
+  if (chartData.length < 2) {
+    return (
+      <div className="flex h-72 w-full items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50">
+        <p className="text-sm font-medium text-slate-500">
+          Not enough housing data to plot a trend yet.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-72 w-full">

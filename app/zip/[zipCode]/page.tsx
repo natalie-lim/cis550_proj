@@ -39,13 +39,29 @@ export default async function ZipDetailPage(
     maximumFractionDigits: 0
   });
 
-  function scoreLabel(score: number | null): string {
-    if (score == null) return "Score unavailable";
-    if (score >= 1.0) return "Well above average";
-    if (score >= 0.5) return "Above average";
-    if (score >= -0.5) return "Average";
-    if (score >= -1.0) return "Below average";
-    return "Well below average";
+  function scoreOutOfTen(score: number | null): number | null {
+    if (score == null) return null;
+    // NCES/SEDA-style scores are centered around 0, so map roughly [-2.5, 2.5] to [0, 10].
+    return Math.max(0, Math.min(10, ((score + 2.5) / 5) * 10));
+  }
+
+  function scorePillClasses(normalizedScore: number | null): string {
+    if (normalizedScore == null) {
+      return "bg-slate-100 text-slate-600";
+    }
+    if (normalizedScore >= 8) {
+      return "bg-emerald-200 text-emerald-900";
+    }
+    if (normalizedScore >= 6) {
+      return "bg-green-100 text-green-800";
+    }
+    if (normalizedScore >= 4) {
+      return "bg-yellow-100 text-yellow-800";
+    }
+    if (normalizedScore >= 2) {
+      return "bg-rose-100 text-rose-700";
+    }
+    return "bg-red-200 text-red-900";
   }
 
   return (
@@ -128,7 +144,7 @@ export default async function ZipDetailPage(
             <thead className="text-xs uppercase text-slate-500">
               <tr>
                 <th className="pb-2 pr-6">School</th>
-                <th className="pb-2 pr-6">Academic rating</th>
+                <th className="pb-2 pr-6">Academic rating (/10)</th>
                 <th className="pb-2 pr-6">Type</th>
                 <th className="pb-2">Grades</th>
               </tr>
@@ -136,10 +152,25 @@ export default async function ZipDetailPage(
             <tbody className="divide-y divide-slate-100">
               {data.schools.map((school) => (
                 <tr key={school.school_id}>
+                  {(() => {
+                    const normalizedScore = scoreOutOfTen(school.test_score);
+                    const scoreText =
+                      normalizedScore == null ? "N/A" : `${normalizedScore.toFixed(1)}/10`;
+                    return (
+                      <>
                   <td className="py-2 pr-6 font-medium text-ink">{school.name}</td>
-                  <td className="py-2 pr-6">{scoreLabel(school.test_score)}</td>
+                  <td className="py-2 pr-6">
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${scorePillClasses(normalizedScore)}`}
+                    >
+                      {scoreText}
+                    </span>
+                  </td>
                   <td className="py-2 pr-6">{school.school_type ?? "—"}</td>
                   <td className="py-2">{school.grade_range ?? "—"}</td>
+                      </>
+                    );
+                  })()}
                 </tr>
               ))}
             </tbody>
