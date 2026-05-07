@@ -8,7 +8,10 @@ export function getPool(): Pool | null {
     return null;
   }
   if (!pool) {
-    pool = new Pool({ connectionString: url });
+    pool = new Pool({
+      connectionString: url,
+      ssl: { rejectUnauthorized: false }
+    });
   }
   return pool;
 }
