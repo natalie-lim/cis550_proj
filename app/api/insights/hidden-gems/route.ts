@@ -42,8 +42,8 @@ export async function GET(request: Request): Promise<NextResponse> {
        SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (
          ORDER BY (lh.home_value / NULLIF(c.median_income, 0))
        ) AS median_pti
-       FROM latest_home lh
-       FROM CensusData c
+      FROM latest_home lh
+      JOIN CensusData c ON c.zip_code = lh.zip_code
        WHERE lh.rn = 1 AND c.zip_code = lh.zip_code AND lh.home_value IS NOT NULL AND c.median_income > 0
      )
      SELECT zm.zip_code,
