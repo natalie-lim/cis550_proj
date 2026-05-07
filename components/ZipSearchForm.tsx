@@ -19,7 +19,7 @@ export function ZipSearchForm(): React.JSX.Element {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center"
+      className="ui-surface flex w-full max-w-xl flex-col gap-2 p-2 sm:flex-row sm:items-center"
     >
       <label className="sr-only" htmlFor="zip-search">
         ZIP code
@@ -30,13 +30,13 @@ export function ZipSearchForm(): React.JSX.Element {
         inputMode="numeric"
         pattern="[0-9]{5}(-[0-9]{4})?"
         placeholder="Search ZIP (e.g. 90210)"
-        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-accent focus:ring-2"
+        className="ui-input"
         value={zip}
         onChange={(e) => setZip(e.target.value)}
       />
       <button
         type="submit"
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+        className="ui-button-primary"
       >
         View ZIP
       </button>

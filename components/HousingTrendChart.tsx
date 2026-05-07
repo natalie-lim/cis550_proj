@@ -18,12 +18,18 @@ type HousingTrendChartProps = {
 export function HousingTrendChart(
   props: HousingTrendChartProps
 ): React.JSX.Element {
+  const dateTickFormatter = (value: number): string =>
+    new Date(value).toLocaleDateString("en-US", {
+      month: "short",
+      year: "2-digit"
+    });
+
   const chartData = props.data
     .filter((point) => point.home_value != null)
     .map((point) => ({
-    month: point.date,
-    value: point.home_value as number
-  }));
+      month: new Date(point.date).getTime(),
+      value: point.home_value as number
+    }));
 
   if (chartData.length < 2) {
     return (
@@ -38,10 +44,21 @@ export function HousingTrendChart(
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData}>
+        <LineChart data={chartData} margin={{ top: 8, right: 10, left: 4, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#94a3b8" />
+          <XAxis
+            dataKey="month"
+            type="number"
+            scale="time"
+            domain={["dataMin", "dataMax"]}
+            tickFormatter={dateTickFormatter}
+            minTickGap={28}
+            interval="preserveStartEnd"
+            tick={{ fontSize: 11 }}
+            stroke="#94a3b8"
+          />
           <YAxis
+            domain={["auto", "auto"]}
             tickFormatter={(v: number) =>
               new Intl.NumberFormat("en-US", {
                 notation: "compact",
@@ -52,6 +69,12 @@ export function HousingTrendChart(
             stroke="#94a3b8"
           />
           <Tooltip
+            labelFormatter={(value: number) =>
+              new Date(value).toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric"
+              })
+            }
             formatter={(value: number) =>
               new Intl.NumberFormat("en-US", {
                 style: "currency",

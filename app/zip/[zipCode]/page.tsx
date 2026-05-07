@@ -65,7 +65,7 @@ export default async function ZipDetailPage(
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 px-4 py-10">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:py-12">
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">
           ZIP intelligence
@@ -76,7 +76,7 @@ export default async function ZipDetailPage(
       </div>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="ui-surface p-5">
           <h2 className="text-lg font-semibold text-ink">Housing trend</h2>
           <p className="text-sm text-slate-600">
             Modeled home values across reporting months.
@@ -85,7 +85,7 @@ export default async function ZipDetailPage(
             <HousingTrendChart data={data.housingSeries} />
           </div>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="ui-surface p-5">
           <h2 className="text-lg font-semibold text-ink">Census snapshot</h2>
           <dl className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between gap-4">
@@ -132,7 +132,7 @@ export default async function ZipDetailPage(
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="ui-surface p-5">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-ink">Nearby schools</h2>
           <span className="text-xs text-slate-500">

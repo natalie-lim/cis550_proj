@@ -1,7 +1,7 @@
 export default function AboutPage(): React.JSX.Element {
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-10">
-      <div className="space-y-2">
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-10 sm:py-12">
+      <div className="ui-surface space-y-2 p-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">
           Methodology
         </p>
@@ -13,7 +13,7 @@ export default function AboutPage(): React.JSX.Element {
         </p>
       </div>
 
-      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="ui-surface space-y-3 p-6">
         <h2 className="text-xl font-semibold text-ink">Datasets</h2>
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
           <li>Zillow Home Value Index extracts for ZIP-level trends.</li>
@@ -22,7 +22,7 @@ export default function AboutPage(): React.JSX.Element {
         </ul>
       </section>
 
-      <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="ui-surface space-y-3 p-6">
         <h2 className="text-xl font-semibold text-ink">Cleaning roadmap</h2>
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
           <li>Harmonize geography to ZIP (handle ZCTA crosswalks where needed).</li>

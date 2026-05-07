@@ -119,8 +119,8 @@ export default async function ComparePage(
   const bothFound = zip1Data != null && zip2Data != null;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 px-4 py-10">
-      <div className="space-y-2">
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:py-12">
+      <div className="ui-surface space-y-2 p-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">
           Compare ZIP codes
         </p>
@@ -131,7 +131,7 @@ export default async function ComparePage(
       <CompareSearchForm defaultZip1={defaultZip1} defaultZip2={defaultZip2} />
 
       {notFoundZips.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {notFoundZips.map((z) => (
             <p key={z}>ZIP code {z} is outside the scope of our data.</p>
           ))}
@@ -144,7 +144,7 @@ export default async function ComparePage(
             {([zip1Data, zip2Data] as CompareZipMetric[]).map((row) => (
               <div
                 key={row.zip.zip_code}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="ui-surface p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -158,7 +158,7 @@ export default async function ComparePage(
                   </div>
                   <Link
                     href={`/zip/${row.zip.zip_code}`}
-                    className="text-xs font-semibold text-accent hover:underline"
+                    className="ui-touch rounded-full px-3 py-1 text-xs font-semibold text-accent hover:bg-blue-50"
                   >
                     Details →
                   </Link>
@@ -209,7 +209,7 @@ export default async function ComparePage(
             ))}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="ui-surface p-5">
             <h2 className="mb-4 text-base font-semibold text-ink">Key Differences</h2>
             <ul className="space-y-3 text-sm text-slate-700">
               {buildDiffSentences(zip1Data, zip2Data).map((sentence, i) => (

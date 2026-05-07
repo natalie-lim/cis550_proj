@@ -2,8 +2,8 @@ import { ZipSearchForm } from "@/components/ZipSearchForm";
 
 export default function HomePage(): React.JSX.Element {
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10">
-      <section className="space-y-4">
+    <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:py-12">
+      <section className="ui-surface space-y-5 p-6 sm:p-8">
         <p className="text-sm font-semibold uppercase tracking-wide text-accent">
           CIS 550 · Housing × Schools × Census
         </p>
@@ -17,13 +17,13 @@ export default function HomePage(): React.JSX.Element {
           markets side by side.
         </p>
         <ZipSearchForm />
-        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-2.5 text-sm text-slate-500">
           <span className="font-semibold text-slate-700">Try:</span>
           {["90001", "10001", "60614"].map((zip) => (
             <a
               key={zip}
               href={`/zip/${zip}`}
-              className="rounded-full bg-white px-3 py-1 font-medium text-accent shadow-sm ring-1 ring-slate-200 hover:bg-slate-50"
+              className="inline-flex h-10 items-center rounded-full bg-white px-5 font-semibold leading-none text-accent shadow-sm ring-1 ring-slate-200 hover:-translate-y-0.5 hover:bg-slate-50"
             >
               {zip}
             </a>
@@ -31,7 +31,7 @@ export default function HomePage(): React.JSX.Element {
         </div>
       </section>
 
-      <section className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-3">
+      <section className="ui-surface grid gap-4 p-6 md:grid-cols-3">
         {[
           {
             title: "ZIP detail",
@@ -46,7 +46,7 @@ export default function HomePage(): React.JSX.Element {
             body: "Advanced SQL routes for growth, undervalued markets, and affordability."
           }
         ].map((card) => (
-          <div key={card.title} className="space-y-2">
+          <div key={card.title} className="space-y-2 rounded-xl bg-white/75 p-4 ring-1 ring-slate-100">
             <h2 className="text-lg font-semibold text-ink">{card.title}</h2>
             <p className="text-sm text-slate-600">{card.body}</p>
           </div>

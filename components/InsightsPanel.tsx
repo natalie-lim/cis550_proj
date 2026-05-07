@@ -120,10 +120,10 @@ export function InsightsPanel(): React.JSX.Element {
             key={id}
             type="button"
             onClick={() => handleTabChange(id)}
-            className={`rounded-full px-3 py-1 text-sm font-semibold ring-1 ring-slate-200 transition ${
+            className={`ui-touch rounded-full px-4 py-2 text-sm font-semibold ring-1 ring-slate-200 ${
               tab === id
-                ? "bg-accent text-white ring-accent"
-                : "bg-white text-slate-700 hover:bg-slate-50"
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white ring-blue-500 shadow"
+                : "bg-white text-slate-700 hover:-translate-y-0.5 hover:bg-slate-50"
             }`}
           >
             {label}
@@ -136,14 +136,14 @@ export function InsightsPanel(): React.JSX.Element {
 
       {/* State filter — only shown on affordability tab */}
       {tab === "affordability" && (
-        <div className="flex items-end gap-3">
+        <div className="ui-surface flex flex-wrap items-end gap-3 p-4">
           <label className="flex flex-col gap-1 text-sm text-slate-700">
             Filter by state (optional)
             <input
               value={stateFilter}
               onChange={(e) => setStateFilter(e.target.value)}
               maxLength={2}
-              className="w-24 rounded-lg border border-slate-300 px-3 py-2 uppercase"
+              className="ui-input w-24 uppercase"
               placeholder="CA"
             />
           </label>
@@ -151,7 +151,7 @@ export function InsightsPanel(): React.JSX.Element {
             type="button"
             onClick={() => void runQuery(tab, stateFilter)}
             disabled={loading}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+            className="ui-button-primary disabled:opacity-60"
           >
             Apply filter
           </button>
@@ -163,7 +163,7 @@ export function InsightsPanel(): React.JSX.Element {
                 void runQuery(tab, "");
               }}
               disabled={loading}
-              className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+              className="ui-button-secondary disabled:opacity-60"
             >
               Remove filter
             </button>
@@ -177,7 +177,7 @@ export function InsightsPanel(): React.JSX.Element {
         <p className="text-sm text-slate-500">Loading results…</p>
       ) : pageRows.length > 0 ? (
         <div className="space-y-3">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="ui-surface overflow-hidden">
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
               <span>
                 {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, allValid.length)} of{" "}
@@ -189,7 +189,7 @@ export function InsightsPanel(): React.JSX.Element {
                   type="button"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="rounded px-2 py-0.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30"
+                  className="ui-touch rounded px-2 py-0.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30"
                   aria-label="Previous page"
                 >
                   ←
@@ -201,7 +201,7 @@ export function InsightsPanel(): React.JSX.Element {
                   type="button"
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="rounded px-2 py-0.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30"
+                  className="ui-touch rounded px-2 py-0.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30"
                   aria-label="Next page"
                 >
                   →
@@ -218,7 +218,7 @@ export function InsightsPanel(): React.JSX.Element {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {pageRows.map((row, index) => (
-                  <tr key={`${row.zip_code}-${index}`} className="hover:bg-slate-50">
+                  <tr key={`${row.zip_code}-${index}`} className="hover:bg-blue-50/40">
                     <td className="px-4 py-3 font-semibold">
                       <Link
                         href={`/zip/${row.zip_code}`}

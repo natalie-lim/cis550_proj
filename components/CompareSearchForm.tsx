@@ -27,7 +27,7 @@ export function CompareSearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col items-end gap-3 sm:flex-row"
+      className="ui-surface flex flex-col items-end gap-3 p-3 sm:flex-row"
     >
       <div className="flex-1">
         <label
@@ -44,7 +44,7 @@ export function CompareSearchForm({
           placeholder="e.g. 90210"
           maxLength={5}
           pattern="\d{5}"
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+          className="ui-input"
         />
       </div>
       <div className="flex-1">
@@ -62,12 +62,12 @@ export function CompareSearchForm({
           placeholder="e.g. 10001"
           maxLength={5}
           pattern="\d{5}"
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+          className="ui-input"
         />
       </div>
       <button
         type="submit"
-        className="rounded-lg bg-accent px-6 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        className="ui-button-primary px-6"
       >
         Compare
       </button>

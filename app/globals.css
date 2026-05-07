@@ -8,4 +8,49 @@
 
 body {
   @apply bg-paper text-ink antialiased;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(59, 130, 246, 0.12), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.12), transparent 30%),
+    linear-gradient(180deg, #f8fbff 0%, #f4f7fb 42%, #f8fafc 100%);
+  min-height: 100vh;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a,
+button,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@layer components {
+  .ui-surface {
+    @apply rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm backdrop-blur-sm;
+  }
+
+  .ui-touch {
+    @apply min-h-11;
+  }
+
+  .ui-button-primary {
+    @apply ui-touch rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0;
+  }
+
+  .ui-button-secondary {
+    @apply ui-touch rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:shadow;
+  }
+
+  .ui-input {
+    @apply ui-touch w-full rounded-xl border border-slate-300/80 bg-white/95 px-3 py-2.5 text-sm shadow-sm outline-none ring-blue-500/60 focus:border-blue-400 focus:ring-2;
+  }
 }
