@@ -4,30 +4,33 @@
 // displays results in a table. Each tab targets a different family decision signal:
 // price growth in accessible areas, school quality vs home cost, and affordability.
 
-import type { InsightListResponse } from "@/lib/types";
+import type { InsightListResponse, InsightRow } from "@/lib/types";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 type TabKey = "growth" | "undervalued" | "affordability";
+
+const PAGE_SIZE = 10;
+const MAX_PAGES = 5;
 
 const TABS: ReadonlyArray<{ id: TabKey; label: string; description: string }> = [
   {
     id: "growth",
     label: "Rising & Affordable",
     description:
-      "ZIP codes where home values are growing fastest among areas with below-median household income — good opportunities to buy before prices climb further."
+      "Top 50 ZIP codes where home values are growing fastest among areas with below-median household income — good opportunities to buy before prices climb further."
   },
   {
     id: "undervalued",
     label: "Undervalued School Districts",
     description:
-      "ZIP codes where school quality ranks higher than home prices within the same state — families get more school quality per dollar than comparable areas nearby."
+      "Top 50 ZIP codes where school quality ranks higher than home prices within the same state — families get more school quality per dollar than comparable areas nearby."
   },
   {
     id: "affordability",
     label: "Most Affordable Areas",
     description:
-      "ZIP codes with the lowest price-to-income ratio — where a typical salary goes furthest toward buying a home. Filter by state to compare within your region."
+      "Top 50 ZIP codes with the lowest price-to-income ratio — where a typical salary goes furthest toward buying a home. Filter by state to compare within your region."
   }
 ];
 
@@ -37,12 +40,20 @@ const METRIC_LABELS: Record<TabKey, string> = {
   affordability: "Price / Income Ratio"
 };
 
-// Avoid -0.0 by coercing negative zero; also guards against null (shown as N/A)
+// Avoid -0.0 by coercing negative zero
 const METRIC_FORMAT: Record<TabKey, (v: number) => string> = {
   growth: (v) => `${(v || 0).toFixed(1)}%`,
   undervalued: (v) => `+${Math.round((v || 0) * 100)} pts`,
   affordability: (v) => (v || 0).toFixed(2)
 };
+
+// Per-tab validity: affordability filters only null (any positive ratio is meaningful);
+// growth and undervalued also filter near-zero values since 0% growth / 0-gap is noise.
+function isValidRow(tab: TabKey, row: InsightRow): boolean {
+  if (row.metric_value == null) return false;
+  if (tab === "affordability") return row.metric_value > 0;
+  return Math.abs(row.metric_value) > 0.001;
+}
 
 export function InsightsPanel(): React.JSX.Element {
   const [tab, setTab] = useState<TabKey>("growth");
@@ -50,18 +61,20 @@ export function InsightsPanel(): React.JSX.Element {
   const [data, setData] = useState<InsightListResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(0);
 
   const runQuery = useCallback(
     async (currentTab: TabKey, currentState: string): Promise<void> => {
       setLoading(true);
       setError(null);
+      setPage(0);
       try {
-        let path: string = "/api/insights/top-growth?limit=10";
+        let path: string = `/api/insights/top-growth?limit=${PAGE_SIZE * MAX_PAGES}`;
         if (currentTab === "undervalued") {
-          path = "/api/insights/undervalued?limit=10";
+          path = `/api/insights/undervalued?limit=${PAGE_SIZE * MAX_PAGES}`;
         }
         if (currentTab === "affordability") {
-          const params = new URLSearchParams({ limit: "10" });
+          const params = new URLSearchParams({ limit: String(PAGE_SIZE * MAX_PAGES) });
           if (currentState.trim().length === 2) {
             params.set("state", currentState.trim().toUpperCase());
           }
@@ -80,17 +93,23 @@ export function InsightsPanel(): React.JSX.Element {
     []
   );
 
-  // Auto-run on mount and whenever the tab changes
   useEffect(() => {
     void runQuery(tab, "");
   }, [tab, runQuery]);
 
   function handleTabChange(newTab: TabKey): void {
     setStateFilter("");
+    setPage(0);
     setTab(newTab);
   }
 
   const activeTab = TABS.find((t) => t.id === tab)!;
+
+  const allValid = data
+    ? data.results.filter((r) => isValidRow(tab, r))
+    : [];
+  const totalPages = Math.min(MAX_PAGES, Math.ceil(allValid.length / PAGE_SIZE));
+  const pageRows = allValid.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -156,16 +175,38 @@ export function InsightsPanel(): React.JSX.Element {
 
       {loading ? (
         <p className="text-sm text-slate-500">Loading results…</p>
-      ) : data ? (() => {
-        // Filter out rows with null or effectively-zero metric values —
-        // those only appear on the ZIP's own detail page when directly searched
-        const visible = data.results.filter(
-          (r) => r.metric_value != null && Math.abs(r.metric_value) > 0.001
-        );
-        return visible.length > 0 ? (
+      ) : pageRows.length > 0 ? (
+        <div className="space-y-3">
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
-              {visible.length} results
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
+              <span>
+                {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, allValid.length)} of{" "}
+                {allValid.length} results
+              </span>
+              {/* Pagination arrows */}
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  className="rounded px-2 py-0.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30"
+                  aria-label="Previous page"
+                >
+                  ←
+                </button>
+                <span className="px-1">
+                  {page + 1} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={page >= totalPages - 1}
+                  className="rounded px-2 py-0.5 text-slate-500 hover:bg-slate-100 disabled:opacity-30"
+                  aria-label="Next page"
+                >
+                  →
+                </button>
+              </div>
             </div>
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase text-slate-500">
@@ -176,7 +217,7 @@ export function InsightsPanel(): React.JSX.Element {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {visible.map((row, index) => (
+                {pageRows.map((row, index) => (
                   <tr key={`${row.zip_code}-${index}`} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-semibold">
                       <Link
@@ -197,11 +238,11 @@ export function InsightsPanel(): React.JSX.Element {
               </tbody>
             </table>
           </div>
-        ) : (
+        </div>
+      ) : (
+        !loading && data != null && (
           <p className="text-sm text-slate-500">No results found for this selection.</p>
-        );
-      })() : (
-        <p className="text-sm text-slate-500">No results found for this selection.</p>
+        )
       )}
     </div>
   );

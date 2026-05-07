@@ -52,7 +52,8 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
      JOIN ZipCode z ON z.zip_code = zh.zip_code
      JOIN CensusData c ON c.zip_code = zh.zip_code
      WHERE ($1::varchar IS NULL OR z.state = $1)
-       AND c.median_income IS NOT NULL
+       AND c.median_income > 0
+       AND zh.home_value > 0
      ORDER BY ratio ASC NULLS LAST
      LIMIT $2`,
     [state, limit]
