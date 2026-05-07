@@ -1,9 +1,5 @@
 "use client";
 
-// Interactive panel that runs three complex SQL-backed analytics queries and
-// displays results in a table. Each tab targets a different family decision signal:
-// price growth in accessible areas, school quality vs home cost, and affordability.
-
 import type { InsightListResponse, InsightRow } from "@/lib/types";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";

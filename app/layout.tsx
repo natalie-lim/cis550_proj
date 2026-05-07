@@ -20,7 +20,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* Required for useAuth() on /account, AuthStatus in nav, history, etc. */}
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
             <SiteNav />

@@ -1,13 +1,5 @@
-// Insight: ZIP codes where school quality ranks higher than home prices within the
-// same state — districts where families get more school quality per dollar spent.
-//
-// Uses PERCENT_RANK() window functions partitioned by state to compute relative
-// price and school-score percentiles, then returns ZIPs where the school percentile
-// exceeds the price percentile by more than 20 points.
-//
-// Existential check: results are further filtered with EXISTS to ensure each returned
-// ZIP has at least one school with an above-average test score (SEDA z-score > 0),
-// guaranteeing the school quality advantage is real and not just a statistical artifact.
+// ZIPs where in-state school-quality percentile beats price percentile by >20,
+// with EXISTS requiring at least one school with SEDA z-score > 0.
 
 import { getCached, setCached } from "@/lib/cache";
 import { queryRows } from "@/lib/db";
