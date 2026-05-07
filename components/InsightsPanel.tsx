@@ -1,21 +1,46 @@
 "use client";
 
+// Interactive panel that runs three complex SQL-backed analytics queries and
+// displays results in a table. Each tab targets a different family decision signal:
+// price growth in accessible areas, school quality vs home cost, and affordability.
+
 import type { InsightListResponse } from "@/lib/types";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 type TabKey = "growth" | "undervalued" | "affordability";
 
-const TABS: ReadonlyArray<{ id: TabKey; label: string }> = [
-  { id: "growth", label: "Top growth + below-median income" },
-  { id: "undervalued", label: "School quality vs price gap" },
-  { id: "affordability", label: "Affordability index" }
+const TABS: ReadonlyArray<{ id: TabKey; label: string; description: string }> = [
+  {
+    id: "growth",
+    label: "Rising & Affordable",
+    description:
+      "ZIP codes where home values are growing fastest among areas with below-median household income — good opportunities to buy before prices climb further."
+  },
+  {
+    id: "undervalued",
+    label: "Undervalued School Districts",
+    description:
+      "ZIP codes where school quality ranks higher than home prices within the same state — families get more school quality per dollar than comparable areas nearby."
+  },
+  {
+    id: "affordability",
+    label: "Most Affordable Areas",
+    description:
+      "ZIP codes with the lowest price-to-income ratio — where a typical salary goes furthest toward buying a home. Filter by state to compare within your region."
+  }
 ];
 
 const METRIC_LABELS: Record<TabKey, string> = {
-  growth: "Growth (%)",
-  undervalued: "Quality/Price Ratio",
-  affordability: "Price/Income Ratio"
+  growth: "Home Value Growth",
+  undervalued: "School vs Price Gap",
+  affordability: "Price / Income Ratio"
+};
+
+const METRIC_FORMAT: Record<TabKey, (v: number) => string> = {
+  growth: (v) => `${v.toFixed(1)}%`,
+  undervalued: (v) => `+${(v * 100).toFixed(0)} pts`,
+  affordability: (v) => v.toFixed(2)
 };
 
 export function InsightsPanel(): React.JSX.Element {
@@ -54,6 +79,7 @@ export function InsightsPanel(): React.JSX.Element {
     []
   );
 
+  // Auto-run on mount and whenever the tab changes
   useEffect(() => {
     void runQuery(tab, "");
   }, [tab, runQuery]);
@@ -63,8 +89,11 @@ export function InsightsPanel(): React.JSX.Element {
     setTab(newTab);
   }
 
+  const activeTab = TABS.find((t) => t.id === tab)!;
+
   return (
     <div className="space-y-6">
+      {/* Tab selector */}
       <div className="flex flex-wrap gap-2">
         {TABS.map(({ id, label }) => (
           <button
@@ -82,6 +111,10 @@ export function InsightsPanel(): React.JSX.Element {
         ))}
       </div>
 
+      {/* Per-tab description */}
+      <p className="text-sm text-slate-600">{activeTab.description}</p>
+
+      {/* State filter — only shown on affordability tab */}
       {tab === "affordability" && (
         <div className="flex items-end gap-3">
           <label className="flex flex-col gap-1 text-sm text-slate-700">
@@ -133,7 +166,6 @@ export function InsightsPanel(): React.JSX.Element {
                 <th className="px-4 py-2">ZIP</th>
                 <th className="px-4 py-2">Location</th>
                 <th className="px-4 py-2">{METRIC_LABELS[tab]}</th>
-                <th className="px-4 py-2">Detail</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -151,9 +183,10 @@ export function InsightsPanel(): React.JSX.Element {
                     {row.city}, {row.state}
                   </td>
                   <td className="px-4 py-3 text-slate-700">
-                    {row.metric_value != null ? row.metric_value.toFixed(2) : "—"}
+                    {row.metric_value != null
+                      ? METRIC_FORMAT[tab](row.metric_value)
+                      : "—"}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{row.detail}</td>
                 </tr>
               ))}
             </tbody>

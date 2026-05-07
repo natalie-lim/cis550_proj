@@ -1,3 +1,8 @@
+// Insight: ZIP codes ranked by price-to-income ratio (home value / median household
+// income). A lower ratio means housing is more affordable relative to what residents
+// earn. Optionally filtered to a single state via the `state` query parameter.
+
+import { getCached, setCached } from "@/lib/cache";
 import { queryRows } from "@/lib/db";
 import { getMockAffordability } from "@/lib/mockData";
 import type { InsightListResponse, InsightRow } from "@/lib/types";
@@ -17,9 +22,17 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
   const parsed: number = Number(limitParam ?? "10");
   const limit: number =
     Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 50) : 10;
+  // Normalize state to uppercase 2-letter code; null means no filter
   const state: string | null = stateParam?.trim().toUpperCase() ?? null;
 
+  const cacheKey = `affordability:${limit}:${state ?? "all"}`;
+  const cached = getCached<InsightListResponse>(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   const rows: AffordRow[] = await queryRows<AffordRow>(
+    // ROW_NUMBER() picks the most recent home value per ZIP before joining to Census.
+    // The parameterized state filter ($1::varchar IS NULL OR z.state = $1) lets a
+    // single query serve both the filtered and unfiltered cases safely.
     `WITH latest_home AS (
        SELECT hd.zip_code,
               hd.home_value,
@@ -39,6 +52,7 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
      JOIN ZipCode z ON z.zip_code = zh.zip_code
      JOIN CensusData c ON c.zip_code = zh.zip_code
      WHERE ($1::varchar IS NULL OR z.state = $1)
+       AND c.median_income IS NOT NULL
      ORDER BY ratio ASC NULLS LAST
      LIMIT $2`,
     [state, limit]
@@ -53,8 +67,10 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
     city: row.city,
     state: row.state,
     metric_value: row.ratio,
-    detail: "Latest modeled home value divided by median household income"
+    detail: null
   }));
 
-  return NextResponse.json({ results, source: "database" });
+  const body: InsightListResponse = { results, source: "database" };
+  setCached(cacheKey, body);
+  return NextResponse.json(body);
 }

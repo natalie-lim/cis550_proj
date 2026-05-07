@@ -1,3 +1,7 @@
+// Fetches all data for a single ZIP code: location, Census snapshot, housing time
+// series, and nearby schools with test scores. Returns 404 when the ZIP is not in the
+// database; falls back to mock data only when no DB connection is present (dev mode).
+
 import { getPool, queryRows } from "@/lib/db";
 import { getMockZipDetail } from "@/lib/mockData";
 import type {

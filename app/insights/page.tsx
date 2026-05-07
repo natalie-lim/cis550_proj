@@ -9,11 +9,9 @@ export default function InsightsPage(): React.JSX.Element {
         </p>
         <h1 className="text-3xl font-semibold text-ink">Market Insights</h1>
         <p className="text-sm text-slate-600">
-          Insights runs complex queries across housing, Census, and school datasets to surface
-          non-obvious patterns. Discover ZIP codes with the strongest price growth in lower-income
-          areas, markets where school quality outpaces home prices (potentially undervalued), and an
-          affordability index ranking that shows where income can most comfortably support home
-          ownership — optionally filtered by state.
+          Three data-driven lenses to help families find the right place to move. Each tab runs a
+          complex query across housing, Census, and school datasets — click any ZIP to explore its
+          full detail page.
         </p>
       </div>
       <InsightsPanel />

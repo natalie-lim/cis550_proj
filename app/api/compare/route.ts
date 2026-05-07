@@ -1,3 +1,9 @@
+// Side-by-side comparison for up to 5 ZIP codes. The metrics query uses a CTE with
+// ROW_NUMBER() window functions to find each ZIP's first and last home values in a
+// single pass, then computes growth, affordability index, and average school score.
+// Returns an empty zips array (not mock data) when the DB is connected but ZIPs are
+// not found, so the frontend can show a proper "out of scope" error.
+
 import { getPool, queryRows } from "@/lib/db";
 import { getMockCompare } from "@/lib/mockData";
 import type {
