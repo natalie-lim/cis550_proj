@@ -37,10 +37,11 @@ const METRIC_LABELS: Record<TabKey, string> = {
   affordability: "Price / Income Ratio"
 };
 
+// Avoid -0.0 by coercing negative zero; also guards against null (shown as N/A)
 const METRIC_FORMAT: Record<TabKey, (v: number) => string> = {
-  growth: (v) => `${v.toFixed(1)}%`,
-  undervalued: (v) => `+${(v * 100).toFixed(0)} pts`,
-  affordability: (v) => v.toFixed(2)
+  growth: (v) => `${(v || 0).toFixed(1)}%`,
+  undervalued: (v) => `+${Math.round((v || 0) * 100)} pts`,
+  affordability: (v) => (v || 0).toFixed(2)
 };
 
 export function InsightsPanel(): React.JSX.Element {
@@ -155,47 +156,52 @@ export function InsightsPanel(): React.JSX.Element {
 
       {loading ? (
         <p className="text-sm text-slate-500">Loading results…</p>
-      ) : data && data.results.length > 0 ? (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
-            {data.results.length} results
-          </div>
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-2">ZIP</th>
-                <th className="px-4 py-2">Location</th>
-                <th className="px-4 py-2">{METRIC_LABELS[tab]}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {data.results.map((row, index) => (
-                <tr key={`${row.zip_code}-${index}`} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-semibold">
-                    <Link
-                      href={`/zip/${row.zip_code}`}
-                      className="text-accent hover:underline"
-                    >
-                      {row.zip_code}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-slate-700">
-                    {row.city}, {row.state}
-                  </td>
-                  <td className="px-4 py-3 text-slate-700">
-                    {row.metric_value != null
-                      ? METRIC_FORMAT[tab](row.metric_value)
-                      : "—"}
-                  </td>
+      ) : data ? (() => {
+        // Filter out rows with null or effectively-zero metric values —
+        // those only appear on the ZIP's own detail page when directly searched
+        const visible = data.results.filter(
+          (r) => r.metric_value != null && Math.abs(r.metric_value) > 0.001
+        );
+        return visible.length > 0 ? (
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
+              {visible.length} results
+            </div>
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="px-4 py-2">ZIP</th>
+                  <th className="px-4 py-2">Location</th>
+                  <th className="px-4 py-2">{METRIC_LABELS[tab]}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        !loading && (
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {visible.map((row, index) => (
+                  <tr key={`${row.zip_code}-${index}`} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 font-semibold">
+                      <Link
+                        href={`/zip/${row.zip_code}`}
+                        className="text-accent hover:underline"
+                      >
+                        {row.zip_code}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-slate-700">
+                      {row.city}, {row.state}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700">
+                      {METRIC_FORMAT[tab](row.metric_value!)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
           <p className="text-sm text-slate-500">No results found for this selection.</p>
-        )
+        );
+      })() : (
+        <p className="text-sm text-slate-500">No results found for this selection.</p>
       )}
     </div>
   );

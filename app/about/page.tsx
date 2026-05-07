@@ -9,14 +9,12 @@ export default function AboutPage(): React.JSX.Element {
         <p className="text-base text-slate-600">
           This project integrates Zillow-style housing indices, U.S. Census American Community
           Survey statistics, and National Center for Education Statistics school profiles at the
-          ZIP level. Milestone 3 focuses on cleaning, entity resolution, and loading data into AWS
-          RDS PostgreSQL; this repository already ships a normalized schema and seed file for local
-          iteration.
+          ZIP level.
         </p>
       </div>
 
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-ink">Datasets (proposal snapshot)</h2>
+        <h2 className="text-xl font-semibold text-ink">Datasets</h2>
         <ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
           <li>Zillow Home Value Index extracts for ZIP-level trends.</li>
           <li>Census ACS 5-year tables for income, rent, commute, and education proxies.</li>
