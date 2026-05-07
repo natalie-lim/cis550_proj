@@ -3,6 +3,7 @@ import type {
   HousingPoint,
   InsightListResponse,
   InsightRow,
+  StateZipSnippet,
   ZipDetailResponse
 } from "@/lib/types";
 
@@ -197,4 +198,30 @@ export function getMockAffordability(
     .filter((r) => (state ? r.state === state.toUpperCase() : true))
     .slice(0, limit);
   return { results: rows, source: "mock" };
+}
+
+export function getMockStateZips(stateCode: string): readonly StateZipSnippet[] {
+  const state = stateCode.trim().toUpperCase();
+  const byState: Record<string, readonly StateZipSnippet[]> = {
+    PA: [
+      { zip_code: "19104", city: "Philadelphia", median_income: 32458 },
+      { zip_code: "19103", city: "Philadelphia", median_income: 112608 },
+      { zip_code: "15213", city: "Pittsburgh", median_income: 53620 }
+    ],
+    CA: [
+      { zip_code: "90001", city: "Los Angeles", median_income: 65123 },
+      { zip_code: "94110", city: "San Francisco", median_income: 142911 },
+      { zip_code: "92101", city: "San Diego", median_income: 99510 }
+    ],
+    NY: [
+      { zip_code: "10001", city: "New York", median_income: 97640 },
+      { zip_code: "11201", city: "Brooklyn", median_income: 117332 },
+      { zip_code: "14604", city: "Rochester", median_income: 41810 }
+    ]
+  };
+
+  return byState[state] ?? [
+    { zip_code: "10001", city: "Sample City", median_income: 72000 },
+    { zip_code: "10002", city: "Sample City", median_income: 68800 }
+  ];
 }
