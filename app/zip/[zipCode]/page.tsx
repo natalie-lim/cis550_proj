@@ -57,9 +57,6 @@ export default async function ZipDetailPage(
         <h1 className="text-3xl font-semibold text-ink">
           {data.zip.city}, {data.zip.state} · {data.zip.zip_code}
         </h1>
-        <p className="text-sm text-slate-500">
-          Source: <span className="font-semibold">{data.source}</span>
-        </p>
       </div>
 
       <section className="grid gap-6 lg:grid-cols-2">
