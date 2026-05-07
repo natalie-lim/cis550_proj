@@ -4,7 +4,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { firebaseAuth } from "@/lib/firebaseClient";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,10 @@ export default function AccountPage(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
 
-  const title = useMemo(() => (mode === "signin" ? "Sign in" : "Create account"), [mode]);
+  const title = useMemo(
+    () => (mode === "signin" ? "Sign in" : "Create account"),
+    [mode],
+  );
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -30,7 +33,11 @@ export default function AccountPage(): React.JSX.Element {
       if (mode === "signin") {
         await signInWithEmailAndPassword(firebaseAuth, email.trim(), password);
       } else {
-        await createUserWithEmailAndPassword(firebaseAuth, email.trim(), password);
+        await createUserWithEmailAndPassword(
+          firebaseAuth,
+          email.trim(),
+          password,
+        );
       }
       router.push("/history");
     } catch (err) {
@@ -58,7 +65,8 @@ export default function AccountPage(): React.JSX.Element {
         ) : user ? (
           <div className="mt-6 space-y-4">
             <p className="text-sm text-slate-700">
-              Signed in as <span className="font-semibold text-ink">{user.email}</span>.
+              Signed in as{" "}
+              <span className="font-semibold text-ink">{user.email}</span>.
             </p>
             <Link
               href="/history"
@@ -70,7 +78,10 @@ export default function AccountPage(): React.JSX.Element {
         ) : (
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="email">
+              <label
+                className="text-sm font-medium text-slate-700"
+                htmlFor="email"
+              >
                 Email
               </label>
               <input
@@ -85,14 +96,19 @@ export default function AccountPage(): React.JSX.Element {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="password">
+              <label
+                className="text-sm font-medium text-slate-700"
+                htmlFor="password"
+              >
                 Password
               </label>
               <input
                 id="password"
                 name="password"
                 type="password"
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                autoComplete={
+                  mode === "signin" ? "current-password" : "new-password"
+                }
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-accent focus:ring-2"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -119,10 +135,14 @@ export default function AccountPage(): React.JSX.Element {
 
             <button
               type="button"
-              onClick={() => setMode((m) => (m === "signin" ? "signup" : "signin"))}
+              onClick={() =>
+                setMode((m) => (m === "signin" ? "signup" : "signin"))
+              }
               className="w-full rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200"
             >
-              {mode === "signin" ? "Need an account? Sign up" : "Have an account? Sign in"}
+              {mode === "signin"
+                ? "Need an account? Sign up"
+                : "Have an account? Sign in"}
             </button>
           </form>
         )}
@@ -130,4 +150,3 @@ export default function AccountPage(): React.JSX.Element {
     </div>
   );
 }
-

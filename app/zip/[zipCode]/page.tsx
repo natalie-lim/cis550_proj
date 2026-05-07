@@ -1,4 +1,5 @@
 import { HousingTrendChart } from "@/components/HousingTrendChart";
+import { RecordZipView } from "@/components/RecordZipView";
 import { getBaseUrl } from "@/lib/getBaseUrl";
 import type { ZipDetailResponse } from "@/lib/types";
 import { notFound } from "next/navigation";
@@ -6,7 +7,7 @@ import { notFound } from "next/navigation";
 async function fetchZip(zipCode: string): Promise<ZipDetailResponse> {
   const res: Response = await fetch(
     `${getBaseUrl()}/api/zip/${encodeURIComponent(zipCode)}`,
-    { cache: "no-store" }
+    { cache: "no-store" },
   );
   if (!res.ok) {
     throw new Error("Failed to load ZIP");
@@ -19,7 +20,7 @@ type ZipPageProps = {
 };
 
 export default async function ZipDetailPage(
-  props: ZipPageProps
+  props: ZipPageProps,
 ): Promise<React.JSX.Element> {
   const { zipCode } = await props.params;
   if (!zipCode) {
@@ -36,7 +37,7 @@ export default async function ZipDetailPage(
   const money = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   });
 
   function scoreLabel(score: number | null): string {
@@ -50,6 +51,11 @@ export default async function ZipDetailPage(
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-10">
+      <RecordZipView
+        zipCode={data.zip.zip_code}
+        city={data.zip.city}
+        state={data.zip.state}
+      />
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">
           ZIP intelligence
@@ -136,7 +142,9 @@ export default async function ZipDetailPage(
             <tbody className="divide-y divide-slate-100">
               {data.schools.map((school) => (
                 <tr key={school.school_id}>
-                  <td className="py-2 pr-6 font-medium text-ink">{school.name}</td>
+                  <td className="py-2 pr-6 font-medium text-ink">
+                    {school.name}
+                  </td>
                   <td className="py-2 pr-6">{scoreLabel(school.test_score)}</td>
                   <td className="py-2 pr-6">{school.school_type ?? "—"}</td>
                   <td className="py-2">{school.grade_range ?? "—"}</td>

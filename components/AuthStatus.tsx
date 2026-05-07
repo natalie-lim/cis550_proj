@@ -63,4 +63,3 @@ export function AuthStatus(): React.JSX.Element {
     </div>
   );
 }
-
