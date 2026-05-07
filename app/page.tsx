@@ -19,7 +19,7 @@ export default function HomePage(): React.JSX.Element {
         <ZipSearchForm />
         <div className="flex flex-wrap gap-2 text-xs text-slate-500">
           <span className="font-semibold text-slate-700">Try:</span>
-          {["90210", "10001", "60614"].map((zip) => (
+          {["90001", "10001", "60614"].map((zip) => (
             <a
               key={zip}
               href={`/zip/${zip}`}

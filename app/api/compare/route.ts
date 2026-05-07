@@ -54,8 +54,9 @@ export async function GET(request: Request): Promise<NextResponse<CompareRespons
     `SELECT cd.zip_code AS zip_code,
             cd.median_income AS median_income,
             cd.median_rent AS median_rent,
-            cd.education_level AS education_level,
-            cd.commute_time AS commute_time
+            cd.commute_time AS commute_time,
+            cd.unemployment_rate AS unemployment_rate,
+            cd.poverty_rate AS poverty_rate
      FROM CensusData cd
      WHERE cd.zip_code = ANY($1::varchar[])`,
     [zips]

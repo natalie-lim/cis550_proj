@@ -7,8 +7,8 @@ import type {
 } from "@/lib/types";
 
 const mockZipDetail: Record<string, ZipDetailResponse> = {
-  "90210": {
-    zip: { zip_code: "90210", city: "Beverly Hills", state: "CA" },
+  "90001": {
+    zip: { zip_code: "90001", city: "Los Angeles", state: "CA" },
     census: {
       median_income: 125000,
       median_rent: 2800,
