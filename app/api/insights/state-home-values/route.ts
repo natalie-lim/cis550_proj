@@ -1,0 +1,37 @@
+import { queryRows } from "@/lib/db";
+import { NextResponse } from "next/server";
+
+type Row = {
+  state: string;
+  num_zips: number;
+  avg_home_value: number;
+  min_home_value: number;
+  max_home_value: number;
+};
+
+export async function GET(request: Request): Promise<NextResponse> {
+  const order = new URL(request.url).searchParams.get("order")?.toLowerCase();
+  const orderSql = order === "asc" ? "ASC" : "DESC";
+
+  const rows = await queryRows<Row>(
+    `WITH latest AS (
+       SELECT hd.zip_code,
+              hd.home_value,
+              ROW_NUMBER() OVER (PARTITION BY hd.zip_code ORDER BY hd.date DESC) AS rn
+       FROM HousingData hd
+     )
+     SELECT z.state AS state,
+            COUNT(*)::int AS num_zips,
+            AVG(l.home_value)::float8 AS avg_home_value,
+            MIN(l.home_value)::float8 AS min_home_value,
+            MAX(l.home_value)::float8 AS max_home_value
+     FROM latest l
+     JOIN ZipCode z ON z.zip_code = l.zip_code
+     WHERE l.rn = 1 AND z.state IS NOT NULL
+     GROUP BY z.state
+     ORDER BY avg_home_value ${orderSql}`,
+    []
+  );
+
+  return NextResponse.json(rows);
+}
