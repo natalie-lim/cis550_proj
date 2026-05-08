@@ -10,7 +10,7 @@ export default function InsightsPage(): React.JSX.Element {
         <h1 className="text-3xl font-semibold text-ink">Market Insights</h1>
         <p className="text-sm text-slate-600">
           Three data-driven lenses to help families find the right place to move. Each tab runs a
-          complex query across housing, Census, and school datasets — click any ZIP to explore its
+          complex query across housing, Census, and school datasets, and click any ZIP to explore its
           full detail page.
         </p>
       </div>

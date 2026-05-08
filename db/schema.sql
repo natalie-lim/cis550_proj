@@ -1,4 +1,4 @@
--- HomeZone Insights — PostgreSQL schema
+-- HomeZone Insights, PostgreSQL schema
 -- Run with: psql "<DATABASE_URL>" -f db/schema.sql
 
 CREATE TABLE IF NOT EXISTS ZipCode (

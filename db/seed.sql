@@ -1,4 +1,4 @@
--- HomeZone Insights — sample seed data for local development
+-- HomeZone Insights, sample seed data for local development
 -- Run with: psql "<DATABASE_URL>" -f db/seed.sql
 
 INSERT INTO ZipCode (zip_code, city, state) VALUES

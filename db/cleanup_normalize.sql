@@ -27,7 +27,7 @@ SET
   grade_range = CASE
     WHEN grade_range IS NULL OR length(btrim(grade_range)) = 0 THEN NULL
     -- normalize en/em dash to standard ASCII hyphen for consistency
-    ELSE replace(replace(btrim(grade_range), '–', '-'), '—', '-')
+    ELSE replace(replace(btrim(grade_range), '–', '-'), U&'\2014', '-')
   END;
 
 COMMIT;

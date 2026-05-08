@@ -109,7 +109,7 @@ export default async function ZipDetailPage(
               <dd className="font-semibold text-ink">
                 {data.census?.median_income != null
                   ? money.format(data.census.median_income)
-                  : "—"}
+                  : "-"}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
@@ -117,7 +117,7 @@ export default async function ZipDetailPage(
               <dd className="font-semibold text-ink">
                 {data.census?.median_rent != null
                   ? money.format(data.census.median_rent)
-                  : "—"}
+                  : "-"}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
@@ -125,7 +125,7 @@ export default async function ZipDetailPage(
               <dd className="font-semibold text-ink">
                 {data.census?.unemployment_rate != null
                   ? `${data.census.unemployment_rate.toFixed(1)}%`
-                  : "—"}
+                  : "-"}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
@@ -133,7 +133,7 @@ export default async function ZipDetailPage(
               <dd className="font-semibold text-ink">
                 {data.census?.poverty_rate != null
                   ? `${data.census.poverty_rate.toFixed(1)}%`
-                  : "—"}
+                  : "-"}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
@@ -141,7 +141,7 @@ export default async function ZipDetailPage(
               <dd className="font-semibold text-ink">
                 {data.census?.commute_time != null
                   ? data.census.commute_time.toFixed(0)
-                  : "—"}
+                  : "-"}
               </dd>
             </div>
           </dl>
@@ -188,15 +188,15 @@ export default async function ZipDetailPage(
                     </span>
                   </td>
                   <td className="py-2 pr-6">
-                    {school.enrollment != null ? school.enrollment.toLocaleString("en-US") : "—"}
+                    {school.enrollment != null ? school.enrollment.toLocaleString("en-US") : "-"}
                   </td>
                   <td className="py-2 pr-6">
                     {school.student_teacher_ratio != null
                       ? school.student_teacher_ratio.toFixed(1)
-                      : "—"}
+                      : "-"}
                   </td>
-                  <td className="py-2 pr-6">{school.school_type ?? "—"}</td>
-                  <td className="py-2">{school.grade_range ?? "—"}</td>
+                  <td className="py-2 pr-6">{school.school_type ?? "-"}</td>
+                  <td className="py-2">{school.grade_range ?? "-"}</td>
                       </>
                     );
                   })()}

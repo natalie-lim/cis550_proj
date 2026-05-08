@@ -54,7 +54,7 @@ export function subscribeToZipViews(args: {
         };
         return {
           id: d.id,
-          zipCode: data.zipCode ?? "—",
+          zipCode: data.zipCode ?? "-",
           city: data.city ?? null,
           state: data.state ?? null,
           createdAt: data.createdAt ?? null,

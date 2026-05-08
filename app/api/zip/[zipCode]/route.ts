@@ -44,7 +44,7 @@ export async function GET(
   );
 
   if (zipRows.length === 0) {
-    // No DB connection — fall back to mock for dev; DB connected but ZIP missing — 404
+    // No DB connection, fall back to mock for dev; if DB is connected and ZIP is missing, return 404.
     if (!getPool()) return NextResponse.json(getMockZipDetail(normalized));
     return new NextResponse(null, { status: 404 }) as NextResponse<ZipDetailResponse>;
   }

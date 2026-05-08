@@ -3,7 +3,7 @@
 // getPool() returns null and queryRows() returns an empty array so API routes fall
 // back to mock data automatically.
 //
-// SSL is required for AWS RDS — without rejectUnauthorized:false the connection is
+// SSL is required for AWS RDS; without rejectUnauthorized:false the connection is
 // refused with "no pg_hba.conf entry ... no encryption".
 
 import { Pool, type QueryResult, type QueryResultRow } from "pg";

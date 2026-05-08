@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 function formatTime(item: ZipViewItem): string {
   const date = item.createdAt?.toDate();
-  if (!date) return "—";
+  if (!date) return "-";
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
@@ -88,7 +88,7 @@ export default function HistoryPage(): React.JSX.Element {
                     <div className="text-sm text-slate-600">
                       {item.city && item.state
                         ? `${item.city}, ${item.state}`
-                        : "—"}
+                        : "-"}
                     </div>
                   </div>
                   <div className="shrink-0 text-right text-xs text-slate-500">

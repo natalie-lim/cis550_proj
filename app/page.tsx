@@ -13,7 +13,7 @@ export default function HomePage(): React.JSX.Element {
         <p className="text-base text-slate-600">
           HomeZone Insights combines housing price data, U.S. Census statistics, and school
           quality metrics to help you understand housing markets at the ZIP code level. Search
-          any ZIP to see price trends, affordability, and nearby school scores — or compare two
+          any ZIP to see price trends, affordability, and nearby school scores, or compare two
           markets side by side.
         </p>
         <ZipSearchForm />

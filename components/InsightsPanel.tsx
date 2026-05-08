@@ -14,19 +14,19 @@ const TABS: ReadonlyArray<{ id: TabKey; label: string; description: string }> = 
     id: "growth",
     label: "Emerging Value Markets",
     description:
-      "Top 50 ZIP codes where home values are growing fastest among areas with below-median household income — strong momentum in markets that are still relatively accessible."
+      "Top 50 ZIP codes where home values are growing fastest among areas with below-median household income, showing strong momentum in markets that are still relatively accessible."
   },
   {
     id: "undervalued",
     label: "Undervalued School Districts",
     description:
-      "Top 50 ZIP codes where school quality ranks higher than home prices within the same state — families get more school quality per dollar than comparable areas nearby."
+      "Top 50 ZIP codes where school quality ranks higher than home prices within the same state, so families get more school quality per dollar than comparable areas nearby."
   },
   {
     id: "affordability",
     label: "Best Price-to-Income Value",
     description:
-      "Top 50 ZIP codes with the lowest price-to-income ratio — where a typical salary goes furthest toward buying a home. Filter by state to compare within your region."
+      "Top 50 ZIP codes with the lowest price-to-income ratio, where a typical salary goes furthest toward buying a home. Filter by state to compare within your region."
   }
 ];
 
@@ -130,7 +130,7 @@ export function InsightsPanel(): React.JSX.Element {
       {/* Per-tab description */}
       <p className="text-sm text-slate-600">{activeTab.description}</p>
 
-      {/* State filter — only shown on affordability tab */}
+      {/* State filter, shown only on affordability tab */}
       {tab === "affordability" && (
         <div className="ui-surface flex flex-wrap items-end gap-3 p-4">
           <label className="flex flex-col gap-1 text-sm text-slate-700">
@@ -240,6 +240,7 @@ export function InsightsPanel(): React.JSX.Element {
           <p className="text-sm text-slate-500">No results found for this selection.</p>
         )
       )}
+
     </div>
   );
 }

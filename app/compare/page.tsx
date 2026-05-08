@@ -169,7 +169,7 @@ export default async function ComparePage(
                     <dd className="font-semibold">
                       {row.latest_home_value != null
                         ? money.format(row.latest_home_value)
-                        : "—"}
+                        : "-"}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3">
@@ -177,7 +177,7 @@ export default async function ComparePage(
                     <dd className="font-semibold">
                       {row.yoy_growth_pct != null
                         ? `${row.yoy_growth_pct.toFixed(1)}%`
-                        : "—"}
+                        : "-"}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3">
@@ -185,7 +185,7 @@ export default async function ComparePage(
                     <dd className="font-semibold">
                       {row.affordability_index != null
                         ? row.affordability_index.toFixed(2)
-                        : "—"}
+                        : "-"}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3">
@@ -201,7 +201,7 @@ export default async function ComparePage(
                     <dd className="font-semibold">
                       {row.census?.median_income != null
                         ? money.format(row.census.median_income)
-                        : "—"}
+                        : "-"}
                     </dd>
                   </div>
                 </dl>
