@@ -14,21 +14,29 @@ export async function GET(request: Request): Promise<NextResponse> {
   const orderSql = order === "asc" ? "ASC" : "DESC";
 
   const rows = await queryRows<Row>(
-    `WITH latest AS (
-       SELECT hd.zip_code,
-              hd.home_value,
-              ROW_NUMBER() OVER (PARTITION BY hd.zip_code ORDER BY hd.date DESC) AS rn
-       FROM HousingData hd
+    `WITH state_zips AS (
+       SELECT z.zip_code, z.state
+       FROM ZipCode z
+       WHERE z.state IS NOT NULL
+     ),
+     latest AS (
+       SELECT sz.state, h.home_value
+       FROM state_zips sz
+       JOIN LATERAL (
+         SELECT hd.home_value
+         FROM HousingData hd
+         WHERE hd.zip_code = sz.zip_code
+         ORDER BY hd.date DESC
+         LIMIT 1
+       ) h ON TRUE
      )
-     SELECT z.state AS state,
+     SELECT l.state AS state,
             COUNT(*)::int AS num_zips,
             AVG(l.home_value)::float8 AS avg_home_value,
             MIN(l.home_value)::float8 AS min_home_value,
             MAX(l.home_value)::float8 AS max_home_value
      FROM latest l
-     JOIN ZipCode z ON z.zip_code = l.zip_code
-     WHERE l.rn = 1 AND z.state IS NOT NULL
-     GROUP BY z.state
+     GROUP BY l.state
      ORDER BY avg_home_value ${orderSql}`,
     []
   );

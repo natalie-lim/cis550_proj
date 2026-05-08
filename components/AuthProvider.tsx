@@ -27,6 +27,11 @@ export function AuthProvider({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (!firebaseAuth) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
       setUser(nextUser);
       setLoading(false);

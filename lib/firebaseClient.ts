@@ -17,4 +17,3 @@ export const firebaseApp: FirebaseApp =
 export const firebaseAuth: Auth = getAuth(firebaseApp);
 
 export const firestore: Firestore = getFirestore(firebaseApp);
-

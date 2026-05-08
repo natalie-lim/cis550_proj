@@ -1,5 +1,5 @@
-// ZIPs where in-state school-quality percentile beats price percentile by >20,
-// with EXISTS requiring at least one school with SEDA z-score > 0.
+// ZIPs where in-state school-quality percentile beats price percentile by >20.
+// Includes both existential and universal checks at the school level.
 
 import { getCached, setCached } from "@/lib/cache";
 import { getPool, queryRows } from "@/lib/db";
@@ -27,35 +27,43 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
   if (cached) return NextResponse.json(cached);
 
   const rows: ValueRow[] = await queryRows<ValueRow>(
-    `WITH latest_home AS (
-       -- Pick the most recent home value per ZIP using a window function
-       SELECT hd.zip_code,
-              hd.home_value,
-              ROW_NUMBER() OVER (PARTITION BY hd.zip_code ORDER BY hd.date DESC) AS rn
-       FROM HousingData hd
-     ),
-     zip_home AS (
-       SELECT lh.zip_code, lh.home_value
-       FROM latest_home lh
-       WHERE lh.rn = 1
-     ),
-     school_avg AS (
-       -- Aggregate test scores to ZIP level for percentile ranking
-       SELECT s.zip_code, AVG(ss.test_score) AS avg_test
+    `WITH school_avg AS (
+      -- Aggregate test scores to ZIP level for percentile ranking
+      -- while enforcing existential + universal conditions:
+      -- 1) there exists at least one school in the ZIP
+      -- 2) all schools in the ZIP have a positive, non-null test score
+      SELECT s.zip_code, AVG(ss.test_score) AS avg_test
        FROM School s
-       JOIN SchoolStats ss ON ss.school_id = s.school_id
+      LEFT JOIN SchoolStats ss ON ss.school_id = s.school_id
        GROUP BY s.zip_code
+      HAVING COUNT(*) >= 1
+         AND COUNT(*) = COUNT(*) FILTER (
+           WHERE ss.test_score IS NOT NULL AND ss.test_score > 0
+         )
+     ),
+     latest_home AS (
+       -- Faster latest-home lookup: for each candidate ZIP from school_avg,
+       -- fetch only one row using backward index scan on (zip_code, date).
+       SELECT sa.zip_code, h.home_value
+       FROM school_avg sa
+       JOIN LATERAL (
+         SELECT hd.home_value
+         FROM HousingData hd
+         WHERE hd.zip_code = sa.zip_code
+         ORDER BY hd.date DESC
+         LIMIT 1
+       ) h ON TRUE
      ),
      ranked AS (
        -- Rank each ZIP within its state by price and by school quality
-       SELECT zh.zip_code,
+       SELECT sa.zip_code,
               z.city AS city,
               z.state AS state,
-              PERCENT_RANK() OVER (PARTITION BY z.state ORDER BY zh.home_value) AS price_pct,
+              PERCENT_RANK() OVER (PARTITION BY z.state ORDER BY lh.home_value) AS price_pct,
               PERCENT_RANK() OVER (PARTITION BY z.state ORDER BY sa.avg_test)   AS school_pct
-       FROM zip_home zh
-       JOIN ZipCode z ON z.zip_code = zh.zip_code
-       JOIN school_avg sa ON sa.zip_code = zh.zip_code
+       FROM school_avg sa
+       JOIN latest_home lh ON lh.zip_code = sa.zip_code
+       JOIN ZipCode z ON z.zip_code = sa.zip_code
      )
      SELECT r.zip_code AS zip_code,
             r.city AS city,
@@ -63,16 +71,7 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
             r.price_pct AS price_score,
             r.school_pct AS school_score
      FROM ranked r
-     WHERE r.school_pct - r.price_pct > 0.2
-       -- Existential check: only include ZIPs that actually have at least one
-       -- above-average school (z-score > 0), confirming the school advantage is real
-       AND EXISTS (
-         SELECT 1
-         FROM School s2
-         JOIN SchoolStats ss2 ON ss2.school_id = s2.school_id
-         WHERE s2.zip_code = r.zip_code
-           AND ss2.test_score > 0
-       )
+    WHERE r.school_pct - r.price_pct > 0.2
      ORDER BY (r.school_pct - r.price_pct) DESC
      LIMIT $1`,
     [limit]

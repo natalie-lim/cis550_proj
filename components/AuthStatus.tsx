@@ -3,7 +3,6 @@
 import { useAuth } from "@/components/AuthProvider";
 import { firebaseAuth } from "@/lib/firebaseClient";
 import { signOut } from "firebase/auth";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
 export function AuthStatus(): React.JSX.Element {
@@ -46,12 +45,6 @@ export function AuthStatus(): React.JSX.Element {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Link
-        href="/history"
-        className="rounded-full px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100"
-      >
-        History
-      </Link>
       <button
         type="button"
         onClick={onSignOut}
