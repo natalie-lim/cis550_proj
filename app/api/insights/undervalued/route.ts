@@ -28,10 +28,7 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
 
   const rows: ValueRow[] = await queryRows<ValueRow>(
     `WITH school_avg AS (
-      -- Aggregate test scores to ZIP level for percentile ranking
-      -- while enforcing existential + universal conditions:
-      -- 1) there exists at least one school in the ZIP
-      -- 2) all schools in the ZIP have a positive, non-null test score
+      -- ZIP-level school score with non-null, positive test-score constraint.
       SELECT s.zip_code, AVG(ss.test_score) AS avg_test
        FROM School s
       LEFT JOIN SchoolStats ss ON ss.school_id = s.school_id
@@ -42,8 +39,7 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
          )
      ),
      latest_home AS (
-       -- Faster latest-home lookup: for each candidate ZIP from school_avg,
-       -- fetch only one row using backward index scan on (zip_code, date).
+      -- Latest home value per ZIP.
        SELECT sa.zip_code, h.home_value
        FROM school_avg sa
        JOIN LATERAL (
@@ -55,7 +51,7 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
        ) h ON TRUE
      ),
      ranked AS (
-       -- Rank each ZIP within its state by price and by school quality
+      -- Rank each ZIP within state by price and school score.
        SELECT sa.zip_code,
               z.city AS city,
               z.state AS state,

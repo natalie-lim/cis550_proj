@@ -1,10 +1,4 @@
-// Insight: ZIP codes with the highest home-value growth that still have below-median
-// household income — areas gaining value while remaining accessible to buyers.
-//
-// Query restructuring: the national-median income subquery and census join are pushed
-// into the bounds CTE (early filter). The original query joined all growth rows to
-// CensusData at the end; this version pre-filters HousingData to qualifying ZIPs so
-// subsequent CTEs process fewer rows. Reduced runtime from ~18s to ~1.2s with indexes.
+// Top-growth ZIPs among below-median-income areas.
 
 import { getCached, setCached } from "@/lib/cache";
 import { getPool, queryRows } from "@/lib/db";
@@ -26,14 +20,13 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
   const limit: number =
     Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 50) : 10;
 
-  // Return cached result if available — this query scans all of HousingData
+  // Serve cached response when available.
   const cacheKey = `top-growth:${limit}`;
   const cached = getCached<InsightListResponse>(cacheKey);
   if (cached) return NextResponse.json(cached);
 
   const rows: GrowthRow[] = await queryRows<GrowthRow>(
-    // Restructured: census income filter moved inside bounds CTE so the growth
-    // calculation only runs for ZIPs that already pass the below-median-income check.
+    // Compute growth between first and latest home value for each ZIP.
     `WITH bounds AS (
        SELECT hd.zip_code,
               MIN(hd.date) AS first_date,
@@ -49,7 +42,6 @@ export async function GET(request: Request): Promise<NextResponse<InsightListRes
        GROUP BY hd.zip_code
      ),
      growth AS (
-       -- Compute total appreciation across the full date range per ZIP
        SELECT b.zip_code,
               ((last_row.home_value - first_row.home_value)
                 / NULLIF(first_row.home_value, 0)) * 100 AS growth_pct
