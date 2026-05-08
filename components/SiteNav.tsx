@@ -21,21 +21,24 @@ export function SiteNav(): React.JSX.Element {
         <Link href="/" className="text-lg font-bold tracking-tight text-ink hover:opacity-90">
           HomeZone <span className="text-accent">Insights</span>
         </Link>
-        <nav className="flex flex-wrap gap-2 text-sm font-medium text-slate-700">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`inline-flex h-10 items-center rounded-full px-4 ${
-                pathname === link.href
-                  ? "bg-blue-100 text-blue-700 shadow-sm"
-                  : "hover:bg-slate-100"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex items-center gap-3">
+          <nav className="flex flex-wrap gap-2 text-sm font-medium text-slate-700">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`inline-flex h-10 items-center rounded-full px-4 ${
+                  pathname === link.href
+                    ? "bg-blue-100 text-blue-700 shadow-sm"
+                    : "hover:bg-slate-100"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <AuthStatus />
+        </div>
       </div>
     </header>
   );
