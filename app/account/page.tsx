@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/components/AuthProvider";
 import { firebaseAuth } from "@/lib/firebaseClient";
+import { signInWithGoogle, signInWithYahoo } from "@/lib/socialAuth";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -19,6 +20,9 @@ export default function AccountPage(): React.JSX.Element {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState<"google" | "yahoo" | null>(null);
+
+  const busy = working || oauthBusy != null;
 
   const title = useMemo(
     () => (mode === "signin" ? "Sign in" : "Create account"),
@@ -47,6 +51,23 @@ export default function AccountPage(): React.JSX.Element {
     }
   };
 
+  const onOAuth = async (which: "google" | "yahoo"): Promise<void> => {
+    setError(null);
+    setOauthBusy(which);
+    try {
+      if (which === "google") {
+        await signInWithGoogle();
+      } else {
+        await signInWithYahoo();
+      }
+      router.push("/history");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed");
+    } finally {
+      setOauthBusy(null);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -66,7 +87,10 @@ export default function AccountPage(): React.JSX.Element {
           <div className="mt-6 space-y-4">
             <p className="text-sm text-slate-700">
               Signed in as{" "}
-              <span className="font-semibold text-ink">{user.email}</span>.
+              <span className="font-semibold text-ink">
+                {user.email ?? user.displayName ?? user.uid}
+              </span>
+              .
             </p>
             <Link
               href="/history"
@@ -76,7 +100,39 @@ export default function AccountPage(): React.JSX.Element {
             </Link>
           </div>
         ) : (
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <div className="mt-6 space-y-4">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void onOAuth("google")}
+                className="flex items-center justify-center gap-2 rounded-lg bg-[#1877F2] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#166FE5] disabled:opacity-60"
+              >
+                {oauthBusy === "google" ? "Opening…" : "Google"}
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void onOAuth("yahoo")}
+                className="flex items-center justify-center gap-2 rounded-lg bg-[#6001D2] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#4f018f] disabled:opacity-60"
+              >
+                {oauthBusy === "yahoo" ? "Opening…" : "Yahoo"}
+              </button>
+            </div>
+
+            <div className="relative py-1">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden
+              >
+                <span className="w-full border-t border-slate-200" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-white px-2 text-slate-500">or email</span>
+              </div>
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <label
                 className="text-sm font-medium text-slate-700"
@@ -127,7 +183,7 @@ export default function AccountPage(): React.JSX.Element {
 
             <button
               type="submit"
-              disabled={working}
+              disabled={busy}
               className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
             >
               {working ? "Working…" : title}
@@ -135,6 +191,7 @@ export default function AccountPage(): React.JSX.Element {
 
             <button
               type="button"
+              disabled={busy}
               onClick={() =>
                 setMode((m) => (m === "signin" ? "signup" : "signin"))
               }
@@ -145,6 +202,7 @@ export default function AccountPage(): React.JSX.Element {
                 : "Have an account? Sign in"}
             </button>
           </form>
+          </div>
         )}
       </div>
     </div>
