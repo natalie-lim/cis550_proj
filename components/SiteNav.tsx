@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthStatus } from "@/components/AuthStatus";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -7,7 +8,8 @@ const links: ReadonlyArray<{ href: string; label: string }> = [
   { href: "/", label: "Home" },
   { href: "/compare", label: "Compare" },
   { href: "/insights", label: "Insights" },
-  { href: "/about", label: "About" }
+  { href: "/history", label: "History" },
+  { href: "/about", label: "About" },
 ];
 
 export function SiteNav(): React.JSX.Element {
